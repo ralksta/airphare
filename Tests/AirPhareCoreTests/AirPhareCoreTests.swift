@@ -360,4 +360,81 @@ struct AirPhareCoreTests {
         #expect(md.contains("192.168.2.1"))
         #expect(md.contains("Fastest measured DNS: **`1.1.1.1` (18 ms)**"))
     }
+
+    @Test("HTMLReportBuilder renders branded German HTML with collapsed explain panels and escapes SSID")
+    func htmlReportBuilderGermanWithEscapingAndCollapsedHelp() {
+        let wifi = WiFiSnapshot(
+            interfaceName: "en0",
+            isConnected: true,
+            ssid: "Cafe <script>alert(1)</script>",
+            band: .band5GHz,
+            channel: 36,
+            channelWidthMHz: 80,
+            phyMode: "802.11ax (Wi-Fi 6)",
+            rssi: -58,
+            noise: -92,
+            txRateMbps: 864
+        )
+        let dns = DNSSnapshot(
+            activeResolver: "192.168.1.1",
+            activeLatencyMs: 14,
+            referenceLatencyMs: 9,
+            googleLatencyMs: 16,
+            routerHost: "192.168.1.1",
+            routerLatencyMs: 14
+        )
+        let report = HealthEvaluator.evaluate(wifi: wifi, latency: nil, dns: dns, rfScan: nil, settings: .default, lang: .de)
+        let html = HTMLReportBuilder.build(
+            wifi: wifi,
+            latency: nil,
+            dns: dns,
+            rfScan: nil,
+            networkQuality: nil,
+            report: report,
+            lang: .de,
+            appVersion: "1.1.0",
+            logoDataURI: "data:image/png;base64,AAAA"
+        )
+
+        #expect(html.contains("<!DOCTYPE html>"))
+        #expect(html.contains(#"<html lang="de">"#))
+        #expect(html.contains(#"src="data:image/png;base64,AAAA""#))
+        #expect(html.contains("Diagnosebericht"))
+        #expect(html.contains("Erklärungen"))
+        #expect(html.contains("Erklärung"))
+        #expect(html.contains(#"<details class="explain">"#))
+        #expect(!html.contains(#"<details class="explain" open>"#))
+        #expect(html.contains("Cafe &lt;script&gt;alert(1)&lt;/script&gt;"))
+        #expect(!html.contains("Cafe <script>alert(1)</script>"))
+        #expect(html.contains("1.1.1.1"))
+    }
+
+    @Test("HTMLReportBuilder localizes all 6 supported languages and uses SVG fallback")
+    func htmlReportBuilderLocalizesAllSixLanguages() {
+        let expectedTitles: [(ResolvedLanguage, String)] = [
+            (.en, "Diagnostic Report"),
+            (.de, "Diagnosebericht"),
+            (.it, "Report diagnostico"),
+            (.fr, "Rapport de diagnostic"),
+            (.es, "Informe de diagnóstico"),
+            (.nl, "Diagnoserapport")
+        ]
+
+        for (lang, expectedTitle) in expectedTitles {
+            let report = HealthEvaluator.evaluate(wifi: nil, latency: nil, dns: nil, rfScan: nil, settings: .default, lang: lang)
+            let html = HTMLReportBuilder.build(
+                wifi: nil,
+                latency: nil,
+                dns: nil,
+                rfScan: nil,
+                networkQuality: nil,
+                report: report,
+                lang: lang,
+                logoDataURI: nil
+            )
+            #expect(html.contains(#"<html lang="\#(lang.rawValue)">"#))
+            #expect(html.contains(expectedTitle))
+            #expect(html.contains(#"<svg class="brand-mark""#))
+        }
+    }
 }

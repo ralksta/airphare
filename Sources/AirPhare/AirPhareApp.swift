@@ -120,9 +120,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(.separator())
 
-        let copyReport = NSMenuItem(title: L10n.t(.menuCopyReport, lang: lang), action: #selector(menuCopyReport), keyEquivalent: "c")
-        copyReport.target = self
-        menu.addItem(copyReport)
+        let openReport = NSMenuItem(title: L10n.t(.menuCopyReport, lang: lang), action: #selector(menuOpenReport), keyEquivalent: "o")
+        openReport.target = self
+        menu.addItem(openReport)
 
         let revealLog = NSMenuItem(title: L10n.t(.menuRevealLog, lang: lang), action: #selector(menuRevealLog), keyEquivalent: "l")
         revealLog.target = self
@@ -147,7 +147,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func menuFullBenchmark() { Task { await vm.runFullBenchmark() } }
     @objc private func menuRFScan() { Task { await vm.runRFScanOnly() } }
     @objc private func menuReconnectWiFi() { Task { await vm.reconnectWiFi() } }
-    @objc private func menuCopyReport() { vm.copyMarkdownReport() }
+    @objc private func menuOpenReport() { vm.openHTMLReport() }
     @objc private func menuRevealLog() { vm.openLogFolder() }
     @objc private func menuOpenRouter() { vm.openRouterURL() }
     @objc private func menuQuit() { NSApplication.shared.terminate(nil) }

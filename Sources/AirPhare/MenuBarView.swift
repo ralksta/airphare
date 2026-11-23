@@ -634,11 +634,11 @@ struct MenuBarView: View {
                 .accessibilityLabel(t(.btnLogA11y))
 
                 Button {
-                    vm.copyMarkdownReport()
+                    vm.openHTMLReport()
                 } label: {
                     Label(
-                        vm.copiedReportFeedback ? t(.btnReportCopied) : t(.btnCopyReport),
-                        systemImage: vm.copiedReportFeedback ? "checkmark" : "doc.on.clipboard"
+                        vm.reportOpenedFeedback ? t(.btnReportCopied) : t(.btnCopyReport),
+                        systemImage: vm.reportOpenedFeedback ? "checkmark" : "doc.richtext"
                     )
                 }
 

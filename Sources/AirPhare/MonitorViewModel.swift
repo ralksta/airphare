@@ -20,7 +20,7 @@ final class MonitorViewModel {
     var logEntryCount: Int = 0
     var analyticsWindow: AnalyticsWindow = .last24Hours
     var analyticsSummary: AnalyticsSummary?
-    var copiedReportFeedback = false
+    var reportOpenedFeedback = false
 
     // Wi-Fi control center state
     var wifiPowerOn: Bool = true
@@ -321,33 +321,90 @@ final class MonitorViewModel {
         self.analyticsSummary = summary
     }
 
-    func copyMarkdownReport() {
-        let englishReport = HealthEvaluator.evaluate(
+    func openHTMLReport() {
+        let localizedReport = HealthEvaluator.evaluate(
             wifi: wifi,
             latency: latency,
             dns: dns,
             rfScan: rfScan,
             settings: settings,
-            lang: .en
+            lang: lang
         )
         let stats24 = HistoryAnalytics.analyzeCSV(at: historyLogger.csvFileURL, window: .last24Hours)
-        let markdown = MarkdownReportBuilder.build(
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.1.1"
+        let now = Date.now
+
+        let html = HTMLReportBuilder.build(
             wifi: wifi,
             latency: latency,
             dns: dns,
             rfScan: rfScan,
             networkQuality: networkQuality,
-            report: englishReport,
-            stats24h: stats24.totalChecks > 0 ? stats24 : nil
+            report: localizedReport,
+            stats24h: stats24.totalChecks > 0 ? stats24 : nil,
+            lang: lang,
+            appVersion: appVersion,
+            logoDataURI: loadAppLogoDataURI(),
+            timestamp: now
         )
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(markdown, forType: .string)
 
-        copiedReportFeedback = true
-        Task { [weak self] in
-            try? await Task.sleep(for: .seconds(2))
-            self?.copiedReportFeedback = false
+        let stampFormatter = DateFormatter()
+        stampFormatter.locale = Locale(identifier: "en_US_POSIX")
+        stampFormatter.dateFormat = "yyyy-MM-dd-HHmmss"
+        let fileName = "AirPhare-Report-\(stampFormatter.string(from: now)).html"
+        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+
+        do {
+            try html.write(to: fileURL, atomically: true, encoding: .utf8)
+            NSWorkspace.shared.open(fileURL)
+
+            reportOpenedFeedback = true
+            Task { [weak self] in
+                try? await Task.sleep(for: .seconds(2))
+                self?.reportOpenedFeedback = false
+            }
+        } catch {
+            // Silently ignore write errors in menu bar context
         }
+    }
+
+    private func loadAppLogoDataURI() -> String? {
+        guard let iconURL = Bundle.main.url(forResource: "AppIcon", withExtension: "icns"),
+              let image = NSImage(contentsOf: iconURL) else {
+            return nil
+        }
+
+        let targetSize = 112
+        guard let rep = NSBitmapImageRep(
+            bitmapDataPlanes: nil,
+            pixelsWide: targetSize,
+            pixelsHigh: targetSize,
+            bitsPerSample: 8,
+            samplesPerPixel: 4,
+            hasAlpha: true,
+            isPlanar: false,
+            colorSpaceName: .deviceRGB,
+            bytesPerRow: 0,
+            bitsPerPixel: 0
+        ) else {
+            return nil
+        }
+        rep.size = NSSize(width: targetSize, height: targetSize)
+
+        NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
+        image.draw(
+            in: NSRect(x: 0, y: 0, width: targetSize, height: targetSize),
+            from: .zero,
+            operation: .copy,
+            fraction: 1.0
+        )
+        NSGraphicsContext.restoreGraphicsState()
+
+        guard let pngData = rep.representation(using: .png, properties: [:]) else {
+            return nil
+        }
+        return "data:image/png;base64,\(pngData.base64EncodedString())"
     }
 
     private func recordLog(eventType: LogEventType, includeNetworkQuality: Bool) async {

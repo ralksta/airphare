@@ -472,9 +472,9 @@ public enum L10n {
         .statsChartLatency: "Gateway vs. Internet Latency (ms)",
         .dnsFastestBadge: "Fastest: %@ (%d ms)",
         .dnsRouterLabel: "Router",
-        .btnCopyReport: "Copy Report",
-        .btnReportCopied: "Copied!",
-        .menuCopyReport: "Copy Diagnostic Report (Markdown)",
+        .btnCopyReport: "Report",
+        .btnReportCopied: "Opened!",
+        .menuCopyReport: "Open Diagnostic Report (HTML)",
         .menuRevealLog: "Reveal CSV Log in Finder"
     ]
 
@@ -673,8 +673,8 @@ public enum L10n {
         .dnsFastestBadge: "Schnellster: %@ (%d ms)",
         .dnsRouterLabel: "Router",
         .btnCopyReport: "Bericht",
-        .btnReportCopied: "Kopiert!",
-        .menuCopyReport: "Diagnosebericht kopieren (Markdown)",
+        .btnReportCopied: "Geöffnet!",
+        .menuCopyReport: "Diagnosebericht öffnen (HTML)",
         .menuRevealLog: "CSV-Protokoll im Finder zeigen"
     ]
 
@@ -873,8 +873,8 @@ public enum L10n {
         .dnsFastestBadge: "Più veloce: %@ (%d ms)",
         .dnsRouterLabel: "Router",
         .btnCopyReport: "Report",
-        .btnReportCopied: "Copiato!",
-        .menuCopyReport: "Copia report diagnostico (Markdown)",
+        .btnReportCopied: "Aperto!",
+        .menuCopyReport: "Apri report diagnostico (HTML)",
         .menuRevealLog: "Mostra file CSV nel Finder"
     ]
 
@@ -1073,8 +1073,8 @@ public enum L10n {
         .dnsFastestBadge: "Plus rapide : %@ (%d ms)",
         .dnsRouterLabel: "Routeur",
         .btnCopyReport: "Rapport",
-        .btnReportCopied: "Copié !",
-        .menuCopyReport: "Copier le rapport (Markdown)",
+        .btnReportCopied: "Ouvert !",
+        .menuCopyReport: "Ouvrir le rapport (HTML)",
         .menuRevealLog: "Afficher le CSV dans le Finder"
     ]
 
@@ -1273,8 +1273,8 @@ public enum L10n {
         .dnsFastestBadge: "Más rápido: %@ (%d ms)",
         .dnsRouterLabel: "Router",
         .btnCopyReport: "Informe",
-        .btnReportCopied: "¡Copiado!",
-        .menuCopyReport: "Copiar informe de diagnóstico (Markdown)",
+        .btnReportCopied: "¡Abierto!",
+        .menuCopyReport: "Abrir informe de diagnóstico (HTML)",
         .menuRevealLog: "Mostrar registro CSV en Finder"
     ]
 
@@ -1473,8 +1473,8 @@ public enum L10n {
         .dnsFastestBadge: "Snelste: %@ (%d ms)",
         .dnsRouterLabel: "Router",
         .btnCopyReport: "Rapport",
-        .btnReportCopied: "Gekopieerd!",
-        .menuCopyReport: "Diagnoserapport kopiëren (Markdown)",
+        .btnReportCopied: "Geopend!",
+        .menuCopyReport: "Diagnoserapport openen (HTML)",
         .menuRevealLog: "CSV-logbestand tonen in Finder"
     ]
 }
