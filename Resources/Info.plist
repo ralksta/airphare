@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
+    <key>CFBundleLocalizations</key>
+    <array>
+        <string>en</string>
+        <string>de</string>
+        <string>it</string>
+        <string>fr</string>
+        <string>es</string>
+        <string>nl</string>
+    </array>
+    <key>CFBundleExecutable</key>
+    <string>AirPhare</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundleIdentifier</key>
+    <string>de.ralksta.airphare</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>AirPhare</string>
+    <key>CFBundleDisplayName</key>
+    <string>AirPhare</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>15.0</string>
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSLocationUsageDescription</key>
+    <string>AirPhare uses Location Services strictly locally on your Mac to read Wi-Fi network names (SSIDs) and filter known networks by range via CoreWLAN.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>AirPhare uses Location Services strictly locally on your Mac to read Wi-Fi network names (SSIDs) and filter known networks by range via CoreWLAN.</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2026 AirPhare</string>
+</dict>
+</plist>
