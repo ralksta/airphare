@@ -233,6 +233,32 @@ public enum L10nKey: String, CaseIterable, Sendable {
     case settingsRequestLocation
     case settingsDefaults
     case settingsDone
+
+    // v1.1: Stats, Charts, Extended DNS, Report & Context Menu
+    case tabLive
+    case tabStats
+    case window24h
+    case window7d
+    case statsNoData
+    case statsChecksCount
+    case statsUptime
+    case statsAvgSNR
+    case statsAvgGateway
+    case statsAvgInternet
+    case statsIncidentsTitle
+    case statsIncidentDFS
+    case statsIncident2GHz
+    case statsIncidentIPv6
+    case statsIncidentJitter
+    case statsIncidentISP
+    case statsChartSNR
+    case statsChartLatency
+    case dnsFastestBadge
+    case dnsRouterLabel
+    case btnCopyReport
+    case btnReportCopied
+    case menuCopyReport
+    case menuRevealLog
 }
 
 public enum L10n {
@@ -424,7 +450,32 @@ public enum L10n {
         .settingsLaunchAtLogin: "Launch at Login",
         .settingsRequestLocation: "Request Location Access for SSIDs",
         .settingsDefaults: "Defaults",
-        .settingsDone: "Done"
+        .settingsDone: "Done",
+
+        .tabLive: "Live",
+        .tabStats: "History",
+        .window24h: "24 Hours",
+        .window7d: "7 Days",
+        .statsNoData: "No logged checks in this timeframe yet. AirPhare logs every check automatically to CSV.",
+        .statsChecksCount: "%d checks logged",
+        .statsUptime: "Uptime",
+        .statsAvgSNR: "Avg SNR",
+        .statsAvgGateway: "Avg Router",
+        .statsAvgInternet: "Avg IPv4",
+        .statsIncidentsTitle: "Detected Incidents",
+        .statsIncidentDFS: "DFS Drift",
+        .statsIncident2GHz: "2.4 GHz",
+        .statsIncidentIPv6: "IPv6 Down",
+        .statsIncidentJitter: "Wi-Fi Jitter",
+        .statsIncidentISP: "ISP Issue",
+        .statsChartSNR: "Signal-to-Noise Ratio (dB)",
+        .statsChartLatency: "Gateway vs. Internet Latency (ms)",
+        .dnsFastestBadge: "Fastest: %@ (%d ms)",
+        .dnsRouterLabel: "Router",
+        .btnCopyReport: "Copy Report",
+        .btnReportCopied: "Copied!",
+        .menuCopyReport: "Copy Diagnostic Report (Markdown)",
+        .menuRevealLog: "Reveal CSV Log in Finder"
     ]
 
     // MARK: - German (DE)
@@ -599,7 +650,32 @@ public enum L10n {
         .settingsLaunchAtLogin: "Bei Anmeldung starten",
         .settingsRequestLocation: "Standortfreigabe für SSID anfragen",
         .settingsDefaults: "Standardwerte",
-        .settingsDone: "Fertig"
+        .settingsDone: "Fertig",
+
+        .tabLive: "Live",
+        .tabStats: "Verlauf",
+        .window24h: "24 Stunden",
+        .window7d: "7 Tage",
+        .statsNoData: "Noch keine Messungen in diesem Zeitraum. AirPhare protokolliert jeden Check automatisch in die CSV.",
+        .statsChecksCount: "%d Messungen protokolliert",
+        .statsUptime: "Uptime",
+        .statsAvgSNR: "Ø SNR",
+        .statsAvgGateway: "Ø Router",
+        .statsAvgInternet: "Ø IPv4",
+        .statsIncidentsTitle: "Erkannte Vorfälle",
+        .statsIncidentDFS: "DFS-Sprung",
+        .statsIncident2GHz: "2,4 GHz",
+        .statsIncidentIPv6: "IPv6-Ausfall",
+        .statsIncidentJitter: "WLAN-Jitter",
+        .statsIncidentISP: "ISP-Störung",
+        .statsChartSNR: "Signal-Rausch-Abstand (dB)",
+        .statsChartLatency: "Router vs. Internet Latenz (ms)",
+        .dnsFastestBadge: "Schnellster: %@ (%d ms)",
+        .dnsRouterLabel: "Router",
+        .btnCopyReport: "Bericht",
+        .btnReportCopied: "Kopiert!",
+        .menuCopyReport: "Diagnosebericht kopieren (Markdown)",
+        .menuRevealLog: "CSV-Protokoll im Finder zeigen"
     ]
 
     // MARK: - Italian (IT)
@@ -774,7 +850,32 @@ public enum L10n {
         .settingsLaunchAtLogin: "Avvia al login",
         .settingsRequestLocation: "Richiedi accesso posizione per SSID",
         .settingsDefaults: "Predefiniti",
-        .settingsDone: "Fine"
+        .settingsDone: "Fine",
+
+        .tabLive: "Live",
+        .tabStats: "Cronologia",
+        .window24h: "24 Ore",
+        .window7d: "7 Giorni",
+        .statsNoData: "Nessun controllo registrato in questo periodo. AirPhare salva automaticamente ogni check in CSV.",
+        .statsChecksCount: "%d controlli salvati",
+        .statsUptime: "Uptime",
+        .statsAvgSNR: "SNR medio",
+        .statsAvgGateway: "Router medio",
+        .statsAvgInternet: "IPv4 medio",
+        .statsIncidentsTitle: "Anomalie rilevate",
+        .statsIncidentDFS: "Cambio DFS",
+        .statsIncident2GHz: "2,4 GHz",
+        .statsIncidentIPv6: "IPv6 ko",
+        .statsIncidentJitter: "Jitter Wi-Fi",
+        .statsIncidentISP: "Linea ISP",
+        .statsChartSNR: "Rapporto segnale/rumore (dB)",
+        .statsChartLatency: "Latenza Router vs. Internet (ms)",
+        .dnsFastestBadge: "Più veloce: %@ (%d ms)",
+        .dnsRouterLabel: "Router",
+        .btnCopyReport: "Report",
+        .btnReportCopied: "Copiato!",
+        .menuCopyReport: "Copia report diagnostico (Markdown)",
+        .menuRevealLog: "Mostra file CSV nel Finder"
     ]
 
     // MARK: - French (FR)
@@ -949,7 +1050,32 @@ public enum L10n {
         .settingsLaunchAtLogin: "Lancer à l'ouverture de session",
         .settingsRequestLocation: "Demander la localisation pour les SSID",
         .settingsDefaults: "Par défaut",
-        .settingsDone: "Terminé"
+        .settingsDone: "Terminé",
+
+        .tabLive: "Direct",
+        .tabStats: "Historique",
+        .window24h: "24 Heures",
+        .window7d: "7 Jours",
+        .statsNoData: "Aucune mesure enregistrée sur cette période. AirPhare journalise automatiquement chaque contrôle en CSV.",
+        .statsChecksCount: "%d contrôles enregistrés",
+        .statsUptime: "Dispo.",
+        .statsAvgSNR: "SNR moy.",
+        .statsAvgGateway: "Routeur moy.",
+        .statsAvgInternet: "IPv4 moy.",
+        .statsIncidentsTitle: "Incidents détectés",
+        .statsIncidentDFS: "Bascule DFS",
+        .statsIncident2GHz: "2,4 GHz",
+        .statsIncidentIPv6: "IPv6 HS",
+        .statsIncidentJitter: "Gigue Wi-Fi",
+        .statsIncidentISP: "Souci FAI",
+        .statsChartSNR: "Rapport signal/bruit (dB)",
+        .statsChartLatency: "Latence Routeur vs. Internet (ms)",
+        .dnsFastestBadge: "Plus rapide : %@ (%d ms)",
+        .dnsRouterLabel: "Routeur",
+        .btnCopyReport: "Rapport",
+        .btnReportCopied: "Copié !",
+        .menuCopyReport: "Copier le rapport (Markdown)",
+        .menuRevealLog: "Afficher le CSV dans le Finder"
     ]
 
     // MARK: - Spanish (ES)
@@ -1124,7 +1250,32 @@ public enum L10n {
         .settingsLaunchAtLogin: "Abrir al iniciar sesión",
         .settingsRequestLocation: "Solicitar localización para SSID",
         .settingsDefaults: "Restablecer",
-        .settingsDone: "Listo"
+        .settingsDone: "Listo",
+
+        .tabLive: "En vivo",
+        .tabStats: "Historial",
+        .window24h: "24 Horas",
+        .window7d: "7 Días",
+        .statsNoData: "Aún no hay registros en este periodo. AirPhare guarda automáticamente cada comprobación en CSV.",
+        .statsChecksCount: "%d registros guardados",
+        .statsUptime: "Activo",
+        .statsAvgSNR: "SNR medio",
+        .statsAvgGateway: "Router medio",
+        .statsAvgInternet: "IPv4 medio",
+        .statsIncidentsTitle: "Incidencias detectadas",
+        .statsIncidentDFS: "Salto DFS",
+        .statsIncident2GHz: "2,4 GHz",
+        .statsIncidentIPv6: "IPv6 caído",
+        .statsIncidentJitter: "Jitter Wi-Fi",
+        .statsIncidentISP: "Fallo ISP",
+        .statsChartSNR: "Relación señal/ruido (dB)",
+        .statsChartLatency: "Latencia Router vs. Internet (ms)",
+        .dnsFastestBadge: "Más rápido: %@ (%d ms)",
+        .dnsRouterLabel: "Router",
+        .btnCopyReport: "Informe",
+        .btnReportCopied: "¡Copiado!",
+        .menuCopyReport: "Copiar informe de diagnóstico (Markdown)",
+        .menuRevealLog: "Mostrar registro CSV en Finder"
     ]
 
     // MARK: - Dutch (NL)
@@ -1299,6 +1450,31 @@ public enum L10n {
         .settingsLaunchAtLogin: "Starten bij inloggen",
         .settingsRequestLocation: "Locatietoegang voor SSID vragen",
         .settingsDefaults: "Standaard",
-        .settingsDone: "Klaar"
+        .settingsDone: "Klaar",
+
+        .tabLive: "Live",
+        .tabStats: "Historie",
+        .window24h: "24 Uur",
+        .window7d: "7 Dagen",
+        .statsNoData: "Nog geen metingen in deze periode. AirPhare logt elke check automatisch naar CSV.",
+        .statsChecksCount: "%d metingen gelogd",
+        .statsUptime: "Uptime",
+        .statsAvgSNR: "Gem. SNR",
+        .statsAvgGateway: "Gem. Router",
+        .statsAvgInternet: "Gem. IPv4",
+        .statsIncidentsTitle: "Gedetecteerde meldingen",
+        .statsIncidentDFS: "DFS-sprong",
+        .statsIncident2GHz: "2,4 GHz",
+        .statsIncidentIPv6: "IPv6 uitval",
+        .statsIncidentJitter: "Wi-Fi jitter",
+        .statsIncidentISP: "ISP-storing",
+        .statsChartSNR: "Signaal-ruisverhouding (dB)",
+        .statsChartLatency: "Router vs. Internet latentie (ms)",
+        .dnsFastestBadge: "Snelste: %@ (%d ms)",
+        .dnsRouterLabel: "Router",
+        .btnCopyReport: "Rapport",
+        .btnReportCopied: "Gekopieerd!",
+        .menuCopyReport: "Diagnoserapport kopiëren (Markdown)",
+        .menuRevealLog: "CSV-logbestand tonen in Finder"
     ]
 }

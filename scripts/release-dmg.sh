@@ -41,15 +41,12 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Auto-detect Developer ID Application certificate if not provided
 if [[ -z "$IDENTITY" ]]; then
     IDENTITY="$(security find-identity -v -p codesigning | awk -F'"' '/Developer ID Application:/ {print $2; exit}')"
 fi
 
 if [[ -z "$IDENTITY" ]]; then
     echo "Error: No 'Developer ID Application' certificate found in keychain."
-    echo "Create one in Xcode -> Settings -> Accounts -> Manage Certificates -> '+' -> Developer ID Application,"
-    echo "or pass --identity \"Developer ID Application: ...\"."
     exit 1
 fi
 
@@ -94,22 +91,63 @@ codesign --verify --deep --strict --verbose=2 "$APP_BUNDLE"
 
 DMG_NAME="${APP_NAME}-${VERSION}.dmg"
 DMG_PATH="$BUILD_DIR/$DMG_NAME"
+RW_DMG_PATH="$BUILD_DIR/${APP_NAME}-${VERSION}-rw.dmg"
 STAGING_DIR="$BUILD_DIR/dmg-staging"
+MOUNT_DIR="/Volumes/$APP_NAME"
 
-echo "==> Creating DMG at $DMG_PATH..."
-rm -rf "$STAGING_DIR" "$DMG_PATH"
-mkdir -p "$STAGING_DIR"
+echo "==> Preparing styled DMG layout..."
+rm -rf "$STAGING_DIR" "$DMG_PATH" "$RW_DMG_PATH"
+mkdir -p "$STAGING_DIR/.background"
 cp -R "$APP_BUNDLE" "$STAGING_DIR/"
 ln -s /Applications "$STAGING_DIR/Applications"
 
-hdiutil create \
-    -volname "$APP_NAME" \
-    -srcfolder "$STAGING_DIR" \
-    -ov \
-    -format UDZO \
-    "$DMG_PATH"
+if [[ -f "$ROOT_DIR/Resources/dmg-background.png" ]]; then
+    cp "$ROOT_DIR/Resources/dmg-background.png" "$STAGING_DIR/.background/background.png"
+fi
 
+# Create temporary read-write HFS+ DMG, apply Finder icon layout, then convert to compressed UDZO
+hdiutil create -fs HFS+ -volname "$APP_NAME" -srcfolder "$STAGING_DIR" -format UDRW -ov "$RW_DMG_PATH" >/dev/null
 rm -rf "$STAGING_DIR"
+
+if [[ -d "$MOUNT_DIR" ]]; then
+    hdiutil detach "$MOUNT_DIR" -quiet || true
+fi
+
+DEVICE="$(hdiutil attach -readwrite -noverify -noautoopen "$RW_DMG_PATH" | awk '/\/Volumes\// {print $1; exit}')"
+sleep 1
+
+if [[ -d "$MOUNT_DIR" ]]; then
+    osascript <<APPLESCRIPT || true
+tell application "Finder"
+    tell disk "$APP_NAME"
+        open
+        set current view of container window to icon view
+        set toolbar visible of container window to false
+        set statusbar visible of container window to false
+        set the bounds of container window to {220, 140, 820, 520}
+        set viewOptions to the icon view options of container window
+        set arrangement of viewOptions to not arranged
+        set icon size of viewOptions to 120
+        try
+            set background picture of viewOptions to file ".background:background.png"
+        end try
+        set position of item "$APP_NAME.app" of container window to {165, 200}
+        set position of item "Applications" of container window to {435, 200}
+        close
+        open
+        update without registering applications
+        delay 1
+        close
+    end tell
+end tell
+APPLESCRIPT
+    sync
+    hdiutil detach "$DEVICE" -quiet || hdiutil detach "$MOUNT_DIR" -force -quiet || true
+fi
+
+echo "==> Converting styled DMG to compressed UDZO at $DMG_PATH..."
+hdiutil convert "$RW_DMG_PATH" -format UDZO -imagekey zlib-level=9 -o "$DMG_PATH" >/dev/null
+rm -f "$RW_DMG_PATH"
 
 echo "==> Signing DMG..."
 codesign --force --timestamp --sign "$IDENTITY" "$DMG_PATH"
@@ -140,17 +178,17 @@ if [[ "$PUBLISH" == true ]]; then
 
 Native macOS menu bar Wi-Fi watchdog, Control Center replacement, DFS/IPv6-loop detector & CSV network logger.
 
-### Highlights
-- **Native Wi-Fi Menu Bar Replacement:** Wi-Fi toggle, RF proximity-matched Known Networks, on-demand Other Networks with inline password prompt, and Wi-Fi Settings shortcut.
-- **Silent Zero-Load Watchdog:** Tracks band, channel/DFS drift, SNR, Wi-Fi vs. ISP latency, stale IPv6 prefixes / routing loops, and DNS latency.
-- **On-Demand Deep Diagnostics:** ETSI-aware channel recommendations and Apple \`networkQuality\` throughput & bufferbloat benchmark.
-- **Rich English CSV Logger:** 58 telemetry columns saved locally to \`~/Library/Application Support/AirPhare/airphare-log.csv\`.
-- **6 Languages Built In:** English, Deutsch, Italiano, Français, Español, Nederlands (auto-detect + live switcher).
+### What's New in $TAG
+- **24h / 7-Day History & Swift Charts:** Built-in History tab reading directly from \`airphare-log.csv\` with uptime %, average SNR/latency KPIs, incident counters (DFS drift, 2.4 GHz fallbacks, IPv6 outages, Wi-Fi jitter, ISP issues), and interactive Swift Charts curves.
+- **4-Way DNS Comparison:** Benchmarks your active system DNS against \`1.1.1.1\`, \`8.8.8.8\`, and your router — highlighting the fastest server live and logging all 4 into CSV.
+- **1-Click Markdown Diagnostic Report:** Copies a clean, formatted Markdown snapshot of your Wi-Fi link, latency, DNS, RF scan, throughput, and 24h summary straight to the clipboard.
+- **Right-Click Context Menu:** Right-click the menu bar icon for instant Quick Check, Full Benchmark, Channel Scan, Wi-Fi Reset, Copy Report, Reveal CSV Log, and Router access.
+- **Styled Drag-to-Applications DMG:** Custom North Sea background & clean Finder layout, Universal Binary (\`arm64\` + \`x86_64\`), signed with Developer ID & notarized by Apple.
 
 ### Installation
 1. Download \`$DMG_NAME\` below.
 2. Open the DMG and drag **AirPhare.app** into **Applications**.
-3. Launch **AirPhare** (signed & notarized with Apple Developer ID).
+3. Launch **AirPhare** (Gatekeeper verified: \`source=Notarized Developer ID\`).
 
 ### Checksum
 \`\`\`

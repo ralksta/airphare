@@ -258,7 +258,7 @@ public actor DiagnosticsService {
         )
     }
 
-    public func runDNSCheck() async -> DNSSnapshot {
+    public func runDNSCheck(gatewayHost: String? = nil) async -> DNSSnapshot {
         let scutilRes = await ShellRunner.run(
             executable: "/usr/sbin/scutil",
             arguments: ["--dns"],
@@ -271,24 +271,48 @@ public actor DiagnosticsService {
         if let resolver = primaryResolver {
             let digActive = await ShellRunner.run(
                 executable: "/usr/bin/dig",
-                arguments: ["@\(resolver)", "fw-\(nonce)-a.wikipedia.org", "+tries=1", "+time=3", "+stats"],
+                arguments: ["@\(resolver)", "ap-\(nonce)-a.wikipedia.org", "+tries=1", "+time=3", "+stats"],
                 timeoutSeconds: 6
             )
             activeMs = OutputParsers.parseDigQueryTime(digOutput: digActive.stdout)
         }
 
-        let digRef = await ShellRunner.run(
+        let digCF = await ShellRunner.run(
             executable: "/usr/bin/dig",
-            arguments: ["@1.1.1.1", "fw-\(nonce)-r.wikipedia.org", "+tries=1", "+time=3", "+stats"],
+            arguments: ["@1.1.1.1", "ap-\(nonce)-cf.wikipedia.org", "+tries=1", "+time=3", "+stats"],
             timeoutSeconds: 6
         )
-        let refMs = OutputParsers.parseDigQueryTime(digOutput: digRef.stdout)
+        let cfMs = OutputParsers.parseDigQueryTime(digOutput: digCF.stdout)
+
+        let digGoogle = await ShellRunner.run(
+            executable: "/usr/bin/dig",
+            arguments: ["@8.8.8.8", "ap-\(nonce)-gg.wikipedia.org", "+tries=1", "+time=3", "+stats"],
+            timeoutSeconds: 6
+        )
+        let googleMs = OutputParsers.parseDigQueryTime(digOutput: digGoogle.stdout)
+
+        var routerMs: Int?
+        if let gw = gatewayHost, !gw.isEmpty {
+            if gw == primaryResolver {
+                routerMs = activeMs
+            } else {
+                let digGW = await ShellRunner.run(
+                    executable: "/usr/bin/dig",
+                    arguments: ["@\(gw)", "ap-\(nonce)-gw.wikipedia.org", "+tries=1", "+time=3", "+stats"],
+                    timeoutSeconds: 6
+                )
+                routerMs = OutputParsers.parseDigQueryTime(digOutput: digGW.stdout)
+            }
+        }
 
         return DNSSnapshot(
             activeResolver: primaryResolver,
             activeLatencyMs: activeMs,
             referenceServer: "1.1.1.1",
-            referenceLatencyMs: refMs
+            referenceLatencyMs: cfMs,
+            googleLatencyMs: googleMs,
+            routerHost: gatewayHost,
+            routerLatencyMs: routerMs
         )
     }
 

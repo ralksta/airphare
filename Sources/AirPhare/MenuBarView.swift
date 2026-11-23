@@ -2,7 +2,13 @@ import AirPhareCore
 import SwiftUI
 
 struct MenuBarView: View {
+    private enum PopoverTab: Hashable {
+        case live
+        case stats
+    }
+
     @Bindable var vm: MonitorViewModel
+    @State private var selectedTab: PopoverTab = .live
     @State private var showSettings = false
     @State private var showOtherNetworks = false
     @State private var passwordPromptSSID: String?
@@ -18,29 +24,40 @@ struct MenuBarView: View {
             if showSettings {
                 SettingsInlineView(vm: vm, onClose: { showSettings = false })
             } else {
-                VStack(alignment: .leading, spacing: 10) {
-                    if vm.wifiPowerOn {
-                        networksPickerSection
-                    }
+                Picker("", selection: $selectedTab) {
+                    Text(t(.tabLive)).tag(PopoverTab.live)
+                    Text(t(.tabStats)).tag(PopoverTab.stats)
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
 
-                    if !vm.report.alerts.isEmpty {
-                        alertsSection
-                    }
-
-                    if vm.wifiPowerOn {
-                        wifiCard
-                        latencyAndDNSCard
-
-                        if let nq = vm.networkQuality {
-                            networkQualityCard(nq)
+                if selectedTab == .stats {
+                    StatsView(vm: vm)
+                } else {
+                    VStack(alignment: .leading, spacing: 10) {
+                        if vm.wifiPowerOn {
+                            networksPickerSection
                         }
 
-                        if let rf = vm.rfScan {
-                            rfRecommendationCard(rf)
+                        if !vm.report.alerts.isEmpty {
+                            alertsSection
                         }
 
-                        if vm.history.count >= 2 {
-                            historyCard
+                        if vm.wifiPowerOn {
+                            wifiCard
+                            latencyAndDNSCard
+
+                            if let nq = vm.networkQuality {
+                                networkQualityCard(nq)
+                            }
+
+                            if let rf = vm.rfScan {
+                                rfRecommendationCard(rf)
+                            }
+
+                            if vm.history.count >= 2 {
+                                historyCard
+                            }
                         }
                     }
                 }
@@ -452,18 +469,33 @@ struct MenuBarView: View {
 
                 if let dns = vm.dns {
                     Divider()
-                    HStack {
-                        Text(L10n.fmt(.dnsActiveLabel, lang: lang, dns.activeResolver ?? "–"))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text(dns.activeLatencyMs.map { "\($0) ms" } ?? "–")
-                            .font(.caption.monospacedDigit().weight(.medium))
-                        Spacer()
-                        Text("1.1.1.1:")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text(dns.referenceLatencyMs.map { "\($0) ms" } ?? "–")
-                            .font(.caption.monospacedDigit().weight(.medium))
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(spacing: 8) {
+                            metricColumn(
+                                title: dns.activeResolver ?? "DNS",
+                                value: dns.activeLatencyMs.map { "\($0) ms" } ?? "–"
+                            )
+                            metricColumn(
+                                title: "1.1.1.1",
+                                value: dns.referenceLatencyMs.map { "\($0) ms" } ?? "–"
+                            )
+                            metricColumn(
+                                title: "8.8.8.8",
+                                value: dns.googleLatencyMs.map { "\($0) ms" } ?? "–"
+                            )
+                            if let gw = dns.routerHost, gw != dns.activeResolver {
+                                metricColumn(
+                                    title: t(.dnsRouterLabel),
+                                    value: dns.routerLatencyMs.map { "\($0) ms" } ?? "–"
+                                )
+                            }
+                        }
+
+                        if let best = dns.fastestServer {
+                            Text(L10n.fmt(.dnsFastestBadge, lang: lang, best.label, best.latencyMs))
+                                .font(.caption2.monospacedDigit())
+                                .foregroundStyle(.green)
+                        }
                     }
                 }
             }
@@ -600,6 +632,15 @@ struct MenuBarView: View {
                     Label(vm.logEntryCount > 0 ? "\(t(.btnLog)) (\(vm.logEntryCount))" : t(.btnLog), systemImage: "doc.text")
                 }
                 .accessibilityLabel(t(.btnLogA11y))
+
+                Button {
+                    vm.copyMarkdownReport()
+                } label: {
+                    Label(
+                        vm.copiedReportFeedback ? t(.btnReportCopied) : t(.btnCopyReport),
+                        systemImage: vm.copiedReportFeedback ? "checkmark" : "doc.on.clipboard"
+                    )
+                }
 
                 Spacer()
 

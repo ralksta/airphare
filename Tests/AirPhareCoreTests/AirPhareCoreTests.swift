@@ -275,4 +275,89 @@ struct AirPhareCoreTests {
         #expect(AppLanguage.system.resolved(preferredLanguages: ["nl-NL"]) == .nl)
         #expect(AppLanguage.system.resolved(preferredLanguages: ["ja-JP"]) == .en)
     }
+
+    @Test("HistoryAnalytics computes 24h KPIs and incident counts from logged CSV")
+    func historyAnalyticsComputesKPIs() async {
+        let tmpDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent("airphare-analytics-\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: tmpDir) }
+
+        let logger = HistoryLogger(directoryURL: tmpDir)
+        let now = ISO8601DateFormatter().date(from: "2026-11-23T12:00:00Z")!
+        let twoHoursAgo = now.addingTimeInterval(-2 * 3600)
+        let oneHourAgo = now.addingTimeInterval(-3600)
+        let tenDaysAgo = now.addingTimeInterval(-10 * 24 * 3600)
+
+        let goodWiFi = WiFiSnapshot(
+            interfaceName: "en0", isConnected: true, ssid: "HomeWiFi-5G",
+            band: .band5GHz, channel: 100, channelWidthMHz: 80, phyMode: "802.11ac",
+            rssi: -62, noise: -95, txRateMbps: 585, activeGlobalIPv6Prefixes: ["2001:db8::/64"]
+        )
+        let goodLat = LatencySnapshot(
+            gatewayHost: "192.168.2.1",
+            gateway: PingStats(host: "192.168.2.1", transmitted: 5, received: 5, packetLossPercent: 0, minMs: 3.5, avgMs: 5.0, maxMs: 9.0, stddevMs: 1.2),
+            ipv4Internet: PingStats(host: "1.1.1.1", transmitted: 5, received: 5, packetLossPercent: 0, minMs: 5.5, avgMs: 7.0, maxMs: 10.0, stddevMs: 1.0),
+            ipv6Internet: PingStats(host: "2606:4700:4700::1111", transmitted: 5, received: 5, packetLossPercent: 0, minMs: 6.5, avgMs: 8.0, maxMs: 12.0, stddevMs: 1.0)
+        )
+        let goodReport = HealthEvaluator.evaluate(wifi: goodWiFi, latency: goodLat, dns: nil, rfScan: nil, settings: .default, lang: .en)
+
+        let badWiFi = WiFiSnapshot(
+            interfaceName: "en0", isConnected: true, ssid: "HomeWiFi-5G",
+            band: .band5GHz, channel: 36, channelWidthMHz: 80, phyMode: "802.11ac",
+            rssi: -68, noise: -93, txRateMbps: 390, activeGlobalIPv6Prefixes: ["2001:db8:1::/64", "2001:db8:2::/64"]
+        )
+        let badLat = LatencySnapshot(
+            gatewayHost: "192.168.2.1",
+            gateway: PingStats(host: "192.168.2.1", transmitted: 5, received: 5, packetLossPercent: 0, minMs: 4.0, avgMs: 15.0, maxMs: 80.0, stddevMs: 10.0),
+            ipv4Internet: PingStats(host: "1.1.1.1", transmitted: 5, received: 5, packetLossPercent: 0, minMs: 6.0, avgMs: 17.0, maxMs: 90.0, stddevMs: 12.0),
+            ipv6Internet: PingStats(host: "2606:4700:4700::1111", transmitted: 5, received: 0, packetLossPercent: 100, minMs: nil, avgMs: nil, maxMs: nil, stddevMs: nil)
+        )
+        let badReport = HealthEvaluator.evaluate(wifi: badWiFi, latency: badLat, dns: nil, rfScan: nil, settings: .default, lang: .en)
+
+        await logger.log(eventType: .check, wifi: goodWiFi, latency: goodLat, dns: nil, rfScan: nil, networkQuality: nil, report: goodReport, timestamp: tenDaysAgo)
+        await logger.log(eventType: .check, wifi: goodWiFi, latency: goodLat, dns: nil, rfScan: nil, networkQuality: nil, report: goodReport, timestamp: twoHoursAgo)
+        await logger.log(eventType: .check, wifi: badWiFi, latency: badLat, dns: nil, rfScan: nil, networkQuality: nil, report: badReport, timestamp: oneHourAgo)
+
+        let summary = HistoryAnalytics.analyzeCSV(at: logger.csvFileURL, window: .last24Hours, now: now)
+        #expect(summary.totalChecks == 2)
+        #expect(summary.uptimePercent == 100.0)
+        #expect(summary.avgSNR == 29.0)
+        #expect(summary.minSNR == 25)
+        #expect(summary.avgGatewayMs == 10.0)
+        #expect(summary.dfsDriftCount == 1)
+        #expect(summary.ipv6OutageCount == 1)
+        #expect(summary.uniqueSSIDs == ["HomeWiFi-5G"])
+    }
+
+    @Test("MarkdownReportBuilder includes Wi-Fi, 4-way DNS, throughput, and 24h summary")
+    func markdownReportBuilderProducesCompleteMarkdown() {
+        let wifi = WiFiSnapshot(
+            interfaceName: "en0",
+            isConnected: true,
+            ssid: "HomeWiFi-5G",
+            band: .band5GHz,
+            channel: 100,
+            channelWidthMHz: 80,
+            phyMode: "802.11ac (Wi-Fi 5)",
+            rssi: -62,
+            noise: -95,
+            txRateMbps: 585
+        )
+        let dns = DNSSnapshot(
+            activeResolver: "100.100.100.100",
+            activeLatencyMs: 21,
+            referenceLatencyMs: 18,
+            googleLatencyMs: 24,
+            routerHost: "192.168.2.1",
+            routerLatencyMs: 28
+        )
+        let report = HealthEvaluator.evaluate(wifi: wifi, latency: nil, dns: dns, rfScan: nil, settings: .default, lang: .en)
+        let md = MarkdownReportBuilder.build(wifi: wifi, latency: nil, dns: dns, rfScan: nil, networkQuality: nil, report: report)
+
+        #expect(md.contains("# AirPhare Diagnostic Report"))
+        #expect(md.contains("HomeWiFi-5G"))
+        #expect(md.contains("8.8.8.8"))
+        #expect(md.contains("192.168.2.1"))
+        #expect(md.contains("Fastest measured DNS: **`1.1.1.1` (18 ms)**"))
+    }
 }

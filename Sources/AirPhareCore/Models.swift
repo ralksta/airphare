@@ -205,19 +205,45 @@ public struct DNSSnapshot: Codable, Sendable, Equatable {
     public let activeLatencyMs: Int?
     public let referenceServer: String
     public let referenceLatencyMs: Int?
+    public let googleLatencyMs: Int?
+    public let routerHost: String?
+    public let routerLatencyMs: Int?
     public let timestamp: Date
+
+    public var fastestServer: (label: String, latencyMs: Int)? {
+        var candidates: [(String, Int)] = []
+        if let active = activeResolver, let ms = activeLatencyMs {
+            candidates.append((active, ms))
+        }
+        if let ms = referenceLatencyMs {
+            candidates.append((referenceServer, ms))
+        }
+        if let ms = googleLatencyMs {
+            candidates.append(("8.8.8.8", ms))
+        }
+        if let gw = routerHost, let ms = routerLatencyMs, gw != activeResolver {
+            candidates.append((gw, ms))
+        }
+        return candidates.min(by: { $0.1 < $1.1 })
+    }
 
     public init(
         activeResolver: String?,
         activeLatencyMs: Int?,
         referenceServer: String = "1.1.1.1",
         referenceLatencyMs: Int?,
+        googleLatencyMs: Int? = nil,
+        routerHost: String? = nil,
+        routerLatencyMs: Int? = nil,
         timestamp: Date = .now
     ) {
         self.activeResolver = activeResolver
         self.activeLatencyMs = activeLatencyMs
         self.referenceServer = referenceServer
         self.referenceLatencyMs = referenceLatencyMs
+        self.googleLatencyMs = googleLatencyMs
+        self.routerHost = routerHost
+        self.routerLatencyMs = routerLatencyMs
         self.timestamp = timestamp
     }
 }

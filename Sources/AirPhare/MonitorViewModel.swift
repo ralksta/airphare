@@ -18,6 +18,9 @@ final class MonitorViewModel {
     var report: HealthReport
     var history: [CheckSample] = []
     var logEntryCount: Int = 0
+    var analyticsWindow: AnalyticsWindow = .last24Hours
+    var analyticsSummary: AnalyticsSummary?
+    var copiedReportFeedback = false
 
     // Wi-Fi control center state
     var wifiPowerOn: Bool = true
@@ -192,7 +195,7 @@ final class MonitorViewModel {
             let latSnap = await service.runIdleLatencyCheck(packetCount: 5)
             self.latency = latSnap
 
-            let dnsSnap = await service.runDNSCheck()
+            let dnsSnap = await service.runDNSCheck(gatewayHost: latSnap.gatewayHost)
             self.dns = dnsSnap
 
             let sample = CheckSample(
@@ -257,7 +260,7 @@ final class MonitorViewModel {
         self.latency = latSnap
 
         progressMessage = L10n.t(.progBenchStep3, lang: lang)
-        let dnsSnap = await service.runDNSCheck()
+        let dnsSnap = await service.runDNSCheck(gatewayHost: latSnap.gatewayHost)
         self.dns = dnsSnap
 
         progressMessage = L10n.t(.progBenchStep4, lang: lang)
@@ -306,6 +309,44 @@ final class MonitorViewModel {
             NSWorkspace.shared.activateFileViewerSelecting([historyLogger.csvFileURL])
         } else {
             NSWorkspace.shared.open(dir)
+        }
+    }
+
+    func refreshAnalytics() async {
+        let url = historyLogger.csvFileURL
+        let window = analyticsWindow
+        let summary = await Task.detached(priority: .utility) {
+            HistoryAnalytics.analyzeCSV(at: url, window: window)
+        }.value
+        self.analyticsSummary = summary
+    }
+
+    func copyMarkdownReport() {
+        let englishReport = HealthEvaluator.evaluate(
+            wifi: wifi,
+            latency: latency,
+            dns: dns,
+            rfScan: rfScan,
+            settings: settings,
+            lang: .en
+        )
+        let stats24 = HistoryAnalytics.analyzeCSV(at: historyLogger.csvFileURL, window: .last24Hours)
+        let markdown = MarkdownReportBuilder.build(
+            wifi: wifi,
+            latency: latency,
+            dns: dns,
+            rfScan: rfScan,
+            networkQuality: networkQuality,
+            report: englishReport,
+            stats24h: stats24.totalChecks > 0 ? stats24 : nil
+        )
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(markdown, forType: .string)
+
+        copiedReportFeedback = true
+        Task { [weak self] in
+            try? await Task.sleep(for: .seconds(2))
+            self?.copiedReportFeedback = false
         }
     }
 

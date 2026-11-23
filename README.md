@@ -58,18 +58,19 @@ Worse yet, many network monitors hammer your Wi-Fi radio with constant backgroun
 * **DFS Channel Drift & 2.4 GHz Fallback Alerts:** Immediately notices if your router jumps away from your preferred 5 GHz channel or your Mac drops to 2.4 GHz.
 * **Stale IPv6 Prefix & Routing-Loop Detector:** Parses `ifconfig` flags to catch multiple active non-deprecated global IPv6 prefixes and detects IPv6 blackholes (100% IPv6 loss while IPv4 works) — with a **1-click Wi-Fi Reset**.
 * **Wi-Fi vs. ISP Isolation:** Separates Hop-1 gateway jitter from upstream ISP latency (`1.1.1.1`) and surfaces a clear status badge.
-* **DNS Latency Check:** Benchmarks uncached lookups on your active system resolver (e.g., Pi-hole / Tailscale MagicDNS) directly against `1.1.1.1`.
+* **DNS Latency Comparison:** Benchmarks uncached lookups across your active system resolver (e.g., Pi-hole / Tailscale MagicDNS), `1.1.1.1`, `8.8.8.8`, and your router — highlighting the fastest server live.
+* **Right-Click Menu & 1-Click Markdown Report:** Right-click the menu bar icon for instant actions (Quick Check, Full Benchmark, Channel Scan, Wi-Fi Reset, Reveal Log) or copy a clean Markdown diagnostic snapshot to your clipboard.
 
 ### 3. On-Demand Deep Diagnostics (Call-Safe)
 * **ETSI/DE-Aware Channel Advisor:** Scans nearby APs on demand, evaluates 5 GHz 80 MHz blocks (`36`, `52`, `100`, `116`) accounting for 160 MHz neighbor overlap, ETSI 1,000 mW power rules (Ch 100+), and weather-radar DFS penalties, and recommends only non-overlapping 2.4 GHz channels (`1`, `6`, `11` at 20 MHz).
 * **Sequential Full Benchmark:** Runs strictly in order so load never pollutes idle metrics: *1) Wi-Fi + RF Scan → 2) Idle Latency (Gateway, IPv4, IPv6) → 3) DNS → 4) Apple's built-in `networkQuality -c` (Downlink, Uplink, Idle Latency, Loaded RPM, and ECN/L4S)*.
 
-### 4. Automatic Long-Term CSV Logging
-* Every background check, benchmark, RF scan, and Wi-Fi reset is automatically appended to:
+### 4. Long-Term CSV Logging & 24h / 7-Day Swift Charts
+* Every background check, benchmark, RF scan, and Wi-Fi reset is automatically logged in clean English (61 telemetry columns including SSID, BSSID, interface errors/drops, full latency stats, 4-way DNS & throughput) to:
   ```text
   ~/Library/Application Support/AirPhare/airphare-log.csv
   ```
-* Includes automatic log rotation at 10 MB, persistent sparkline history across restarts (last 48 samples), and a **`Log (N)`** button to reveal the CSV directly in Finder for multi-day analysis in Numbers, Excel, or Python.
+* **Built-in History Tab:** Switch between **Live** and **History (`24h` / `7d`)** right inside the popover to inspect uptime %, average SNR & latency KPIs, incident counters (DFS drift, 2.4 GHz fallbacks, IPv6 outages, Wi-Fi jitter, ISP issues), and native **Swift Charts** curves.
 
 ---
 
