@@ -34,7 +34,7 @@ Worse yet, many network monitors hammer your Wi-Fi radio with constant backgroun
 * **Whisper-quiet in the background:** Every 5 minutes (configurable), AirPhare runs lightweight, strictly sequential checks using `CoreWLAN`, tiny idle pings, IPv6 prefix inspection, and a single DNS probe — **zero bandwidth load, zero active scan jitter**.
 * **Only taps you on the shoulder when something actually breaks:** Native macOS notifications (with a 30-minute cooldown per alert category so it never spams) paired with **1-click fixes** (such as a 3-second Wi-Fi reset to clear stale IPv6 prefixes, an on-demand channel scan, or opening your router admin page).
 * **Replaces the built-in macOS Wi-Fi menu bar widget:** Clean Wi-Fi power toggle, proximity-matched known networks (only networks actually in range), expandable nearby networks with inline password entry, and a direct shortcut to macOS Wi-Fi Settings.
-* **Real-world impact:** Moving off a crowded 5 GHz Channel 36 onto Channel 100 (ETSI 1,000 mW power budget) and clearing a stale IPv6 prefix produced these exact sequential `networkQuality` results:
+* **Real-world diagnostic impact:** AirPhare does not modify your router settings directly — it diagnoses what is actually wrong, tells you the cleanest channel for your local RF environment, and alerts you when things drift. Acting on those exact findings (manually moving the router off a crowded 5 GHz Channel 36 onto Channel 100 with ETSI's 1,000 mW power budget, plus clearing a stale IPv6 prefix on macOS) produced these sequential `networkQuality` results:
 
 | Metric | Before (Ch 36 + Stale IPv6) | After (Ch 100 + IPv6 Fix) | Delta |
 |---|---:|---:|---:|
