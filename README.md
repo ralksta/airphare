@@ -16,6 +16,10 @@
   <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="MIT License" />
 </p>
 
+<p align="center">
+  <img src="docs/screenshots/hero.png" alt="AirPhare — Live Diagnostics, Proactive Alerts, and 24h/7d Swift Charts" width="100%" />
+</p>
+
 ---
 
 ## Why AirPhare?
@@ -71,6 +75,43 @@ Worse yet, many network monitors hammer your Wi-Fi radio with constant backgroun
   ~/Library/Application Support/AirPhare/airphare-log.csv
   ```
 * **Built-in History Tab:** Switch between **Live** and **History (`24h` / `7d`)** right inside the popover to inspect uptime %, average SNR & latency KPIs, incident counters (DFS drift, 2.4 GHz fallbacks, IPv6 outages, Wi-Fi jitter, ISP issues), and native **Swift Charts** curves.
+
+---
+
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <strong>Live Diagnostics &amp; RF Channel Advisor</strong><br />
+      <sub>Wi-Fi link telemetry, Hop-1 vs. ISP latency, 4-way DNS, <code>networkQuality</code> &amp; sparklines</sub><br /><br />
+      <img src="docs/screenshots/live-diagnostics.png" alt="AirPhare Live Diagnostics Popover" width="380" />
+    </td>
+    <td align="center" width="50%">
+      <strong>Proactive Alerts &amp; 1-Click Fixes</strong><br />
+      <sub>Instant detection of IPv6 blackholes, stale prefixes &amp; DFS channel drift</sub><br /><br />
+      <img src="docs/screenshots/proactive-alerts.png" alt="AirPhare Proactive Alerts Popover" width="380" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <strong>24h / 7-Day Swift Charts History</strong><br />
+      <sub>Uptime KPIs, incident counters, SNR &amp; dual-hop latency curves from CSV logs</sub><br /><br />
+      <img src="docs/screenshots/history-charts.png" alt="AirPhare 24h and 7d History Charts" width="380" />
+    </td>
+    <td align="center" width="50%">
+      <strong>Settings &amp; Multilingual UI</strong><br />
+      <sub>Custom thresholds, preferred 5 GHz channel, Launch at Login &amp; 6 languages</sub><br /><br />
+      <img src="docs/screenshots/settings.png" alt="AirPhare Settings View" width="380" />
+    </td>
+  </tr>
+</table>
+
+<p align="center">
+  <strong>Localized HTML Diagnostic Report — Printable &amp; Shareable</strong><br />
+  <sub>Generated locally with interactive explanations, hop-by-hop breakdown &amp; PDF print styling</sub><br /><br />
+  <img src="docs/screenshots/html-report.png" alt="AirPhare Localized HTML Diagnostic Report" width="90%" />
+</p>
 
 ---
 
